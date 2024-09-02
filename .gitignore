@@ -1,0 +1,53 @@
+# Ignore macOS system files
+.DS_Store
+
+# Ignore node_modules directory (for Node.js projects)
+node_modules/
+
+# Ignore log files and temporary files
+*.log
+*.tmp
+*.temp
+
+# Ignore compiled Python files
+*.pyc
+*.pyo
+__pycache__/
+
+# Ignore IDE/editor files
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Ignore compiled Java files
+*.class
+*.jar
+
+# Ignore build directories
+build/
+dist/
+
+# Ignore environment variables files (for Python projects)
+.env
+
+# Ignore coverage reports
+coverage/
+coverage.json
+coverage.lcov
+*.lcov
+
+# Ignore dependency directories
+vendor/
+bower_components/
+
+# Ignore database files
+*.sqlite3
+
+# Ignore any file named secrets.json
+secrets.json
+
+# Ignore .env
+**/.env
