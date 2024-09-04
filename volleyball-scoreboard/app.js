@@ -42,6 +42,13 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+io.on('connection', (socket) => {
+  console.log('Użytkownik połączony z WebSocket');
+
+  socket.on('disconnect', () => {
+    console.log('Użytkownik rozłączony');
+  });
+});
 module.exports.io = io;
 
 module.exports = app;

@@ -1,11 +1,11 @@
-const db = require('../routes.db');
+const db = require('../routes/db');
 
 const getMatches = async (status) => {
-    let query = 'SELECT * FROM mecze';
+    let query = 'SELECT * FROM mecze ';
     if(status) {
-        query += ' WHERE status = $1';
+        query += ' WHERE status = $1 ';
     }
-    query += 'ORDER BY date DESC';
+    query += 'ORDER BY data DESC';
 
     const matches = await db.any(query, status ? [status] :[]);
     return matches;
