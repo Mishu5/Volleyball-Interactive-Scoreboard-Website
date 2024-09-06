@@ -1,5 +1,59 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
+  h1= "Match list" 
+  form(action="/index", method="get")
+  label(for="status") Filter by status: 
+  select(name="status")
+    option(value="") All 
+    option(value="PLANNED") Planned 
+    option(value="IN_PROGRESS") In progress 
+    option(value="FINISHED") Finished 
+  button(type="submit") Filter
+
+  ul#matches-list
+    each match in matches
+      li(data-id=match.id)
+        p #{match.teamA} vs #{match.teamB} - #{new Date(match.date).toISOString().slice(0, 10)}
+        p Status: #{match.status} (#{match.id})
+
+        if match.status === 'PLANNED' || match.status === 'IN_PROGRESS'
+          a(href=`/index/view/${match.id}`) View
+
+        if match.status === 'FINISHED'
+          button(onclick=`copyMatch('${match.id}')`) Copy to clipboard
+
+        form(action="/index/delete/${match.id}", method="post", style="display:inline;")
+          button(type="submit") Delete match
+  
+  script(src="/socket.io/socket.io.js")
+  script. 
+    var socket = io();
+    //listening for match deletion
+    socket.on('matchDelete', function(data){
+      const matchElement = document.querySelector(`li[data-id="${data.matchId}"]`);
+      if (matchElement) {
+        matchElement.remove();
+      }
+    });
+
+    //listening for match update
+    socket.on('statusUpdated', function(data) {
+      const matchElement = document.querySelector(`li[data-id="${data.matchId}"]`);
+      if (matchElement) {
+        const statusText = matchElement.querySelector('p:nth-child(2)');
+        if (statusText) {
+          statusText.textContent = `Status: ${data.status}`;
+        }
+      }
+    });
+
+    //copy to clipboard
+    function copyMatch(matchId) {
+    fetch(`/index/copy/${matchId}`)
+      .then(response => response.text())
+      .then(text => {
+        navigator.clipboard.writeText(text);
+        alert('Copied to clipboard!');
+      });
+    }
