@@ -2,14 +2,14 @@ extends layout
 
 block content
   h1= "Match list" 
-  form(action="/index", method="get")
-  label(for="status") Filter by status: 
-  select(name="status")
-    option(value="") All 
-    option(value="PLANNED") Planned 
-    option(value="IN_PROGRESS") In progress 
-    option(value="FINISHED") Finished 
-  button(type="submit") Filter
+  form(action="/", method="get")
+    label(for="status") Filter by status: 
+    select(name="status")
+      option(value="") All 
+      option(value="PLANNED") Planned 
+      option(value="IN_PROGRESS") In progress 
+      option(value="FINISHED") Finished 
+    button(type="submit") Filter
 
   ul#matches-list
     each match in matches
@@ -18,12 +18,12 @@ block content
         p Status: #{match.status} (#{match.id})
 
         if match.status === 'PLANNED' || match.status === 'IN_PROGRESS'
-          a(href=`/index/view/${match.id}`) View
+          a(href=`/view/${match.id}`) View
 
         if match.status === 'FINISHED'
           button(onclick=`copyMatch('${match.id}')`) Copy to clipboard
 
-        form(action="/index/delete/${match.id}", method="post", style="display:inline;")
+        form(action="/delete/${match.id}", method="post", style="display:inline;")
           button(type="submit") Delete match
   
   script(src="/socket.io/socket.io.js")
@@ -50,7 +50,7 @@ block content
 
     //copy to clipboard
     function copyMatch(matchId) {
-    fetch(`/index/copy/${matchId}`)
+    fetch(`/copy/${matchId}`)
       .then(response => response.text())
       .then(text => {
         navigator.clipboard.writeText(text);
