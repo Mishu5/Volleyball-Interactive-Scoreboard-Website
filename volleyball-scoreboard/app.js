@@ -7,9 +7,13 @@ var socketIO = require('socket.io');
 var http = require('http');
 var bcrypt = require('bcryptjs');
 var db = require('./routes/db');
+var session = require('express-session');
+
+require('dotenv').config();
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var authRouter = require('./routes/auth');
 
 var app = express();
 var server = http.createServer(app);
@@ -27,6 +31,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
+app.use('/auth', authRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -52,5 +57,14 @@ io.on('connection', (socket) => {
   });
 });
 module.exports.io = io;
+
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    secure: false
+  }
+}));
 
 module.exports = app;
