@@ -5,6 +5,8 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var socketIO = require('socket.io');
 var http = require('http');
+var bcrypt = require('bcryptjs');
+var db = require('./routes/db');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');

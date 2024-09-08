@@ -19,7 +19,7 @@ const getMatchById = async (id) => {
 const addMatch = async (match) => {
     const {data, teamA, teamB, result, resultDetailed, timeline, status } = match;
     await db.none(
-        'INSERT INTO mecze(data, teamA, teamB, result, resultDetailed, timeline, status) values ($1, $2, $3, $4, $5, $6, $7)',
+        'INSERT INTO mecze (data, teamA, teamB, result, resultDetailed, timeline, status) values ($1, $2, $3, $4, $5, $6, $7)',
         [data, teamA, teamB, result, resultDetailed, timeline, status]
     );
 }

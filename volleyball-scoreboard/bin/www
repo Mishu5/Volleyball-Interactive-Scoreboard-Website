@@ -4,6 +4,7 @@
  * Module dependencies.
  */
 
+var { initializeAdminUser } = require('../models/users');
 var app = require('../app');
 var debug = require('debug')('volleyball-scoreboard:server');
 var http = require('http');
@@ -32,7 +33,9 @@ io.on('connection', (socket) =>{
  * Listen on provided port, on all network interfaces.
  */
 
-server.listen(port);
+server.listen(port, async () => {
+  await initializeAdminUser();
+});
 server.on('error', onError);
 server.on('listening', onListening);
 
