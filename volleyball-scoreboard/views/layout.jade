@@ -3,5 +3,18 @@ html
   head
     title= title
     link(rel='stylesheet', href='/stylesheets/style.css')
+    if errorMessage
+      script.
+        //JS to show error message
+        alert("#{errorMessage}");
   body
+    header
+      if typeof userId !== 'undefined' && userId
+        div(style="position: absolute; top: 10px; right: 10px;")
+          form(action="/auth/logout" method="GET")
+            button(type="submit") Wyloguj się
+      else
+        div(style="position: absolute; top: 10px; right: 10px;")
+          a(href="/auth/login") Zaloguj się
+
     block content

@@ -28,6 +28,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: true,
+  cookie: {
+    secure: false
+  }
+}));
+app.use((req, res, next) => {
+  res.locals.userId = req.session.userId || null;
+  next();
+});
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
@@ -57,14 +69,5 @@ io.on('connection', (socket) => {
   });
 });
 module.exports.io = io;
-
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: true,
-  cookie: {
-    secure: false
-  }
-}));
 
 module.exports = app;

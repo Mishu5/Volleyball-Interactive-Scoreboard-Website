@@ -3,8 +3,14 @@ var router = express.Router();
 var bcrypt = require('bcryptjs');
 var { createUser, findUserByLogin } = require('../models/users');
 
+router.get('/logout', (req, res) =>{
+    req.session.userId = null;
+    req.session.userRole = null;
+    res.redirect('/');
+})
+
 router.get('/register', (req, res) =>{
-    
+    res.render('register', {});
 });
 
 router.post('/register', async (req, res) =>{
@@ -14,21 +20,20 @@ router.post('/register', async (req, res) =>{
     try{
         const user = await findUserByLogin(login);
         if (user) {
-            return res.status(400).json({ message: 'User already exists' });
+            return res.render('register', {errorMessage: 'User already exists'});
         }
 
         const userId = await createUser(login, password);
-        res.status(201).json({message: "User created"});
+        return res.redirect('/auth/login');
 
     }catch(error){
-        res.status(500).json({message : "Error in creating user"});
-        console.error(error);
+        return res.render('register', {errorMessage: 'Internal server error'});
     }
 
 });
 
 router.get('/login', (req, res) => {
-    
+    res.render('login', {});
 });
 
 router.post('/login', async (req, res) => {
@@ -39,22 +44,22 @@ router.post('/login', async (req, res) => {
 
         const user = await findUserByLogin(login);
         if(!user){
-            res.status(400).json({message: 'Incorrect login or password'});
+            return res.render('login', {erorrMessage: 'Incorrect login or password'});
         }
 
         const isMatch = await bcrypt.compare(password, user.password);
         if(!isMatch){
-            res.status(400).json({message: 'Incorrect login or password'});
+            return res.render('login', {errorMessage: 'Incorrect login or password'});
         }
 
         req.session.userId = user.id;
         req.session.userRole = user.role;
 
-        res.status(200).json({message: 'Logged in'});
+        return res.redirect('/');
 
     }catch(error){
-        res.status(500).json({message: 'Server error'});
-        console.error(error);
+        return res.render('register', {errorMessage: 'Internal server error'});
+    
     }
 
 });
