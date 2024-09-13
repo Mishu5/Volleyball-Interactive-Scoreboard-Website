@@ -12,6 +12,13 @@ async function addTeam(teamName, players){
     }
 }
 
+async function getAllTeams(){
+    const query = 'SELECT * FROM teams';
+    const result = db.any(query);
+    return result;
+}
+
 module.exports ={
     addTeam,
+    getAllTeams,
 }

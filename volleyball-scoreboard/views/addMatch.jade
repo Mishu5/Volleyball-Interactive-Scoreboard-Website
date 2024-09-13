@@ -1,0 +1,37 @@
+extends layout 
+
+block content 
+    h1 Create new match
+    form(action="/match/addMatch" method="post" id="addMatchForm")
+        div 
+            label(for="teamA") Team 1:
+            select(name="teamA" id="teamA")
+                option(value="" disabled selected) -- Select team --
+                each team in teams 
+                    option(value=team.id)= team.name
+
+        div 
+            label(for="teamB") Team 2:
+            select(name="teamB" id="teamB")
+                option(value="" disabled selected) -- Select team --
+                each team in teams 
+                    option(value=team.id)= team.name
+        
+        button(type="submit") Create
+    
+    script.
+      document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('addMatchForm');
+        const teamASelect = document.getElementById('teamA');
+        const teamBSelect = document.getElementById('teamB');
+        
+        form.addEventListener('submit', function (event) {
+          if (teamASelect.value === "" || teamBSelect.value === "") {
+            alert("Select team!");
+            event.preventDefault();
+          } else if (teamASelect.value === teamBSelect.value) {
+            alert("Teams must be different!");
+            event.preventDefault();
+          }
+        });
+      });

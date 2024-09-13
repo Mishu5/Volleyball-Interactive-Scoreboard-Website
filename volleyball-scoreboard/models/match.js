@@ -18,7 +18,7 @@ const getMatchById = async (id) => {
 
 const addMatch = async (teamA, teamB) => {
     await db.none(
-        'INSERT INTO matches (teamA, teamB, status) values ($1, $2, $3)',
+        'INSERT INTO matches (teama_id, teamb_id, status) values ($1, $2, $3)',
         [teamA, teamB, "PLANNED"]
     );
 }
