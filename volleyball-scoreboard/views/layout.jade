@@ -12,9 +12,11 @@ html
       if typeof userId !== 'undefined' && userId
         div(style="position: absolute; top: 10px; right: 10px;")
           form(action="/auth/logout" method="GET")
-            button(type="submit") Wyloguj się
+            button(type="submit") Log out
       else
         div(style="position: absolute; top: 10px; right: 10px;")
-          a(href="/auth/login") Zaloguj się
-
+          a(href="/auth/login") Log in
+      if typeof userRole !== 'undefined' && userRole === 'referee'
+        div(style="position: aboluet; top: 10px; right 20px;")
+          a(href="/teams/add") Add team
     block content

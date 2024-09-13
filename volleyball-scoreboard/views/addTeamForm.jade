@@ -1,0 +1,59 @@
+extends layout
+
+block content  
+    h1 Add a New Team
+    form#teamForm
+      div
+        label(for="teamName") Team Name:
+        input(type="text" id="teamName" name="name" required)
+      div#playersContainer
+        div.player
+          label Player 1:
+          input(type="text" name="playerName1" placeholder="Player Name" required)
+          input(type="text" name="playerPosition1" placeholder="Player Position" required)
+      div
+        button(type="button" id="addPlayer") Add Player
+      div
+        button(type="submit") Submit
+
+    script(src="https://code.jquery.com/jquery-3.6.0.min.js")
+    script.
+      $(document).ready(function(){
+        $('#addPlayer').click(function(){
+          const playerNumber = $('.player').length + 1;
+          const playerHtml = `
+            <div class="player">
+              <label>Player ${playerNumber}:</label>
+              <input type="text" name="playerName${playerNumber}" placeholder="Player Name" required>
+              <input type="text" name="playerPosition${playerNumber}" placeholder="Player Position" required>
+            </div>
+          `;
+          $('#playersContainer').append(playerHtml);
+        });
+
+        $('#teamForm').submit(function(event) {
+          event.preventDefault();
+          const players = [];
+          $('.player').each(function() {
+            const playerName = $(this).find('input[name^="playerName"]').val();
+            const playerPosition = $(this).find('input[name^="playerPosition"]').val();
+            players.push({ name: playerName, position: playerPosition });
+          });
+
+          $.ajax({
+            url: '/teams/add',
+            type: 'POST',
+            data: {
+              name: $('#teamName').val(),
+              players: JSON.stringify(players)
+            },
+            success: function(response) {
+              alert(response.message);
+              window.location.reload();
+            },
+            error: function(error) {
+              alert('Error adding team');
+            }
+          });
+        });
+      });

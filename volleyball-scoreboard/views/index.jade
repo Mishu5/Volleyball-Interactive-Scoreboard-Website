@@ -13,7 +13,7 @@ block content
 
   ul#matches-list
     each match in matches
-      li(data-id=match.id)
+      li(date-id=match.id)
         p #{match.teamA} vs #{match.teamB} - #{new Date(match.date).toISOString().slice(0, 10)}
         p Status: #{match.status} (#{match.id})
 
@@ -29,21 +29,22 @@ block content
   script(src="/socket.io/socket.io.js")
   script. 
     var socket = io();
+    
     //listening for match deletion
-    socket.on('matchDelete', function(data){
-      const matchElement = document.querySelector(`li[data-id="${data.matchId}"]`);
+    socket.on('matchDelete', function(date){
+      const matchElement = document.querySelector(`li[date-id="${date.matchId}"]`);
       if (matchElement) {
         matchElement.remove();
       }
     });
 
     //listening for match update
-    socket.on('statusUpdated', function(data) {
-      const matchElement = document.querySelector(`li[data-id="${data.matchId}"]`);
+    socket.on('statusUpdated', function(date) {
+      const matchElement = document.querySelector(`li[date-id="${date.matchId}"]`);
       if (matchElement) {
         const statusText = matchElement.querySelector('p:nth-child(2)');
         if (statusText) {
-          statusText.textContent = `Status: ${data.status}`;
+          statusText.textContent = `Status: ${date.status}`;
         }
       }
     });

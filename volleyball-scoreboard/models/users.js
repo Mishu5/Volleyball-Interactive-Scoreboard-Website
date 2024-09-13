@@ -4,13 +4,13 @@ require('dotenv').config();
 
 async function createUser(login, password) {
     const hashedPassword = await bcrypt.hash(password, 10);
-    let query = 'INSERT INTO uzytkownicy (login, password, role) VALUES ($1, $2, $3) RETURNING id';
+    let query = 'INSERT INTO users (login, password, role) VALUES ($1, $2, $3) RETURNING id';
     const result = await db.one(query, [login, hashedPassword, "observator"]);
     return result.id;
 }
 
 async function findUserByLogin(login) {
-    let query = 'SELECT * FROM uzytkownicy WHERE login = $1';
+    let query = 'SELECT * FROM users WHERE login = $1';
     const result = await db.oneOrNone(query, [login]);
     return result;
 }
@@ -24,7 +24,7 @@ async function initializeAdminUser(){
 
             const adminLogin = process.env.ADMIN_LOGIN;
             const adminPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
-            let query = 'INSERT INTO uzytkownicy (login, password, role) VALUES ($1, $2, $3)';
+            let query = 'INSERT INTO users (login, password, role) VALUES ($1, $2, $3)';
             await db.none(query, [adminLogin, adminPassword, "referee"]);
 
         }else{

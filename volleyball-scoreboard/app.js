@@ -12,8 +12,9 @@ var session = require('express-session');
 require('dotenv').config();
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 var authRouter = require('./routes/auth');
+var teamsRouter = require('./routes/teams');
+var matchRouter = require('./routes/match');
 
 var app = express();
 var server = http.createServer(app);
@@ -38,12 +39,14 @@ app.use(session({
 }));
 app.use((req, res, next) => {
   res.locals.userId = req.session.userId || null;
+  res.locals.userRole = req.session.userRole || null;
   next();
 });
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
 app.use('/auth', authRouter);
+app.use('/teams', teamsRouter);
+app.use('/match', matchRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
