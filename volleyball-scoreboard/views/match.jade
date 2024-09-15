@@ -29,7 +29,6 @@ block content
     if match.status === 'FINISHED'
         p The match is finished.
 
-    button#showMatchHistory View Match History 
     button#closeView Close View and Return to Home    
 
     script(src="/socket.io/socket.io.js")
@@ -40,11 +39,11 @@ block content
         var matchStartDate = new Date("#{match.date}");
         var teamAName = "#{teamA.name}";
         var teamBName = "#{teamB.name}";
-        var match = "#{match.resultdetailed.results}";
-        console.log(match);
-        if (match) {
-            
-            match.split(',').forEach(function(result, index) {
+        var resultsHistory = "#{match.resultdetailed && match.resultdetailed.results ? match.resultdetailed.results : ''}";
+        var userRole = "#{userRole}";
+        console.log(resultsHistory)
+        if (resultsHistory) {
+            resultsHistory.split(',').forEach(function(result, index) {
                 $('#history').append(`<p>Set ${index + 1}: ${result}</p>`);
             });
         }
@@ -67,6 +66,56 @@ block content
             $('#score').text(score);
         }
 
+        function checkEndSetButton() {
+            var scores = $('#score').text().split(':').map(Number);
+            var teamAScore = scores[0];
+            var teamBScore = scores[1];
+
+            if ((teamAScore >= 25 && teamAScore - teamBScore >= 2) ||
+                (teamBScore >= 25 && teamBScore - teamAScore >= 2)) {
+                $('#endSet').prop('disabled', false);
+            } else {
+                $('#endSet').prop('disabled', true);
+            }
+        }
+
+        function checkEndMatchButton() {
+            var historyText = $('#history').text().trim();
+            
+            var results = historyText.match(/Set \d+: \d+:\d+/g);
+            
+            if (!results) {
+                $('#endMatch').prop('disabled', true);
+                return;
+            }
+
+            var teamAWins = 0;
+            var teamBWins = 0;
+
+            results.forEach(function(result) {
+                var match = /Set \d+: (\d+):(\d+)/.exec(result);
+                if (match) {
+                    var teamAScore = parseInt(match[1], 10);
+                    var teamBScore = parseInt(match[2], 10);
+                    
+                    if (teamAScore > teamBScore) {
+                        teamAWins++;
+                    } else if (teamBScore > teamAScore) {
+                        teamBWins++;
+                    }
+                }
+            });
+
+            if (teamAWins >= 2 || teamBWins >= 2) {
+                $('#endMatch').prop('disabled', false);
+            } else {
+                $('#endMatch').prop('disabled', true);
+            }
+        }
+
+        checkEndSetButton();
+        checkEndMatchButton();
+
         socket.on('scoreUpdate', function(data) {
             if (data.match.id == #{match.id}) {
                 teamAName = data.teamA.name;
@@ -84,10 +133,9 @@ block content
                     data.match.resultdetailed.results.forEach(function(result, index) {
                         $('#history').append(`<p>Set ${index + 1}: ${result}</p>`);
                     });
-                } else {
-                    console.error("Invalid resultDetailed format:", data.match.resultdetailed);
                 }
-
+                checkEndSetButton();
+                checkEndMatchButton();
                 console.log(data);
             }
         });
@@ -162,5 +210,6 @@ block content
             window.location.href = "/";
         });
 
-        
-    
+        if (userRole !== 'referee'|| $('#status').text() === 'FINISHED') {
+            $('#incrementTeamA, #decrementTeamA, #incrementTeamB, #decrementTeamB, #swapTeams, #endSet, #endMatch').prop('disabled', true);
+        };

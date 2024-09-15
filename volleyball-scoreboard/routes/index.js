@@ -42,8 +42,17 @@ router.get('/copy/:id', async (req, res) => {
   const teamBScores = results.map(result => result.split(':')[1]).join(' | ');
 
 
-  const teamATotal = results.reduce((total, result) => total + parseInt(result.split(':')[0]), 0);
-  const teamBTotal = results.reduce((total, result) => total + parseInt(result.split(':')[1]), 0);
+  let teamATotal = 0;
+  let teamBTotal = 0;
+
+  results.forEach(result => {
+    const scores = result.split(':').map(Number);
+    if (scores[0] > scores[1]) {
+      teamATotal++;
+    } else if (scores[1] > scores[0]) {
+      teamBTotal++;
+    }
+  });
 
   const result = `
 Teams  ${headers} | Total

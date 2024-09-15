@@ -21,8 +21,6 @@ block content
           if match.resultdetailed 
             each result, index in match.resultdetailed 
               Set #{result.join(' | ')}
-        if match.status === 'PLANNED' || match.status === 'IN_PROGRESS'
-          a(href=`/match/${match.id}`) View
         if match.status !== 'FINISHED'
           button(onclick=`viewMatch('${match.id}')`) View match
         if match.status === 'FINISHED'
