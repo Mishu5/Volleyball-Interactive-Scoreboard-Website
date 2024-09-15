@@ -1,4 +1,123 @@
 extends layout 
 
 block content 
+    h1 Match between
+        span#teamAName #{teamA.name}
+        span#teamBName #{teamB.name}
+    
+    p Elapsed Time: 
+    p#elapsedTime 0m 0s
+
+    h2 Current Score: 
+    p#score  #{match.result}
+    
+    p Status: 
+    p#status #{match.status}
+
+    if match.status !== 'FINISHED'
+        button#incrementTeamA +1 #{teamA.name}
+        button#decrementTeamA -1 #{teamA.name}
+        button#incrementTeamB +1 #{teamB.name}
+        button#decrementTeamB -1 #{teamB.name}
+        button#swapTeams Swap Teams 
+        button#endSet End Set 
+        button#endMatch End Match 
+
+    if match.status === 'FINISHED'
+        p The match is finished.
+
+    button#showMatchHistory View Match History 
+    button#closeView Close View and Return to Home    
+
+    script(src="/socket.io/socket.io.js")
+    script(src="https://code.jquery.com/jquery-3.6.0.min.js")
+
+    script.
+        $(document).ready(function(){
+            //var socket = io();
+            var matchStartDate = new Date("#{match.date}");
+            var teamAName = "#{teamA.name}";
+            var teamBName = "#{teamB.name}";
+            
+            function updateElapsedTime() {
+                var now = new Date();
+                var elapsed = now - matchStartDate;
+                var minutes = Math.floor(elapsed / (1000 * 60));
+                var seconds = Math.floor((elapsed % (1000 * 60)) / 1000);
+                $('#elapsedTime').text(
+                    `${minutes}m ${seconds}s`
+                );
+            }
+
+            setInterval(updateElapsedTime, 1000);
+
+            function updateMatchInfo(){
+                $('#teamAname').text(teamAName);
+                $('#teamBname').text(teamBName);
+                $('#score').text('"${match.result}"');
+            }
+
+            //- socket.on('scoreUpdate', function(data){
+            //-     if(data.matchId == #{match.id}){
+            //-         //do updating here
+            //-     }
+            //- });
+
+            function updateScore(team, increment){
+                var scores = $('#score').text().split(':').map(Number);
+                if(team === 'teamA'){
+                    scores[0] += increment;
+                }else{
+                    scores[1] += increment;
+                }
+
+                scores[0] = Math.max(scores[0], 0);
+                scores[1] = Math.max(scores[1], 0);
+
+                var newScore = `${scores[0]}:${scores[1]}`;
+
+                $.post(`/match/${#{match.id}}/update-score`, {setScore: newScore}, function(response){
+                    if(response.success){
+                        console.log("Score updated");
+                    }
+                });
+            }
+
+            $('#incrementTeamA').click(function() {
+                updateScore('teamA', 1);
+            });
+
+            $('#decrementTeamA').click(function() {
+                updateScore('teamA', -1);
+            });
+
+            $('#incrementTeamB').click(function() {
+                updateScore('teamB', 1);
+            });
+
+            $('#decrementTeamB').click(function() {
+                updateScore('teamB', -1);
+            });            
+
+            $('#swapTeams').click(function(){
+                $.post(`/match/${#{match.id}}/swap-teams`, function(response){
+                    if(response.success){
+                        console.log("Swapped");
+                    }
+                });
+            });
+
+            $('#endSet').click(function() {
+                $.post(`/match/${#{match.id}}/add-score-to-details`, function(response) {
+                    if (response.success) {
+                        console.log("Set ended");
+                    }   
+                });
+            });
+
+            $('#closeView').click(function(){
+                window.location.href = "/";
+            });
+
+        });
     

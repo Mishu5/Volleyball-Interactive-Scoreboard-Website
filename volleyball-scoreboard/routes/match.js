@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 const io = require('../app').io;
 const { addMatch, getMatchById, startMatch, updateScore, endSet, swapTeams, endMatch } = require('../models/match');
-const { getAllTeams } = require('../models/teams');
+const { getAllTeams, getTeamById } = require('../models/teams');
 
 router.post('/addMatch', async(req, res)=>{
     if(req.session.userRole && req.session.userRole !== "referee"){
@@ -21,8 +21,10 @@ router.get('/add', async(req, res)=>{
 router.get('/:id', async(req, res) =>{
     const { id } = req.params;
     const match = await getMatchById(id);
+    const teamA = await getTeamById(match.teama_id);
+    const teamB = await getTeamById(match.teamb_id);
 
-    res.render('match', {match: match});
+    res.render('match', {match: match, teamA: teamA, teamB: teamB});
 });
 
 router.post('/:id/update-score', async(req, res)=>{
@@ -32,7 +34,7 @@ router.post('/:id/update-score', async(req, res)=>{
     
     try{
 
-        let match = getMatchById(matchId);
+        let match = await getMatchById(matchId);
         if(match.status === "PLANNED"){
             startMatch(matchId);
         }

@@ -10,17 +10,11 @@ router.get('/', async (req, res) => {
   res.render('index', { matches });
 });
 
-router.post('/delet/:id', async (req, res) => {
+router.post('/delete/:id', async (req, res) => {
   await Match.deleteMatch(req.params.id);
   io.emit('matchDeleted', {matchId: req.params.id});
   res.redirect('/index');
 });
-
-
-router.get('/view/:id', async (req, res) => {
-  const match = await Match.getMatchById(req.params.id);
-  res.render(viewMatch, {match});
-})
 
 router.get('/copy/:id', async (req, res) => {
   const match = await Match.getMatchById(req.params.id);

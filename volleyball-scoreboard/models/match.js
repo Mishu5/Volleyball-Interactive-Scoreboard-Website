@@ -12,7 +12,7 @@ const getMatches = async (status) => {
 }
 
 const getMatchById = async (id) => {
-    const match = await db.one('SELECT * FROM matches WHERE id = $1');
+    const match = await db.oneOrNone('SELECT * FROM matches WHERE id = $1', [id]);
     return match;
 }
 
@@ -30,7 +30,7 @@ const deleteMatch = async (id) => {
 const updateScore = async (matchId, newScore) =>{
     try{
         const query = "UPDATE matches SET result = $1 WHERE id = $2";
-        db.none(query, [matchId, newScore]);
+        db.none(query, [newScore, matchId]);
     }catch(error){
         console.error(error);
         return {status: 500};

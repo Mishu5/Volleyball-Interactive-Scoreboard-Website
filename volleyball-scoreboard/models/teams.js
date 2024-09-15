@@ -18,7 +18,14 @@ async function getAllTeams(){
     return result;
 }
 
+async function getTeamById(id){
+    const query = "SELECT * FROM teams WHERE id = $1";
+    const result = db.oneOrNone(query, [id]);
+    return result;
+};
+
 module.exports ={
     addTeam,
     getAllTeams,
+    getTeamById
 }
