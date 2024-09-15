@@ -54,6 +54,7 @@ router.post('/login', async (req, res) => {
 
         req.session.userId = user.id;
         req.session.userRole = user.role;
+        req.session.login = user.login;
 
         return res.redirect('/');
 

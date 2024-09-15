@@ -46,6 +46,7 @@ app.use(session({
 app.use((req, res, next) => {
   res.locals.userId = req.session.userId || null;
   res.locals.userRole = req.session.userRole || null;
+  res.locals.login = req.session.login || null;
   next();
 });
 

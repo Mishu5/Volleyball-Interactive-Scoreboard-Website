@@ -21,7 +21,8 @@ router.get('/:id', async(req, res) =>{
     const { id } = req.params;
     const match = await getMatchById(id);
     if(!match){
-        return res.status(404);    }
+        return res.redirect('/');  
+    }
     const teamA = await getTeamById(match.teama_id);
     const teamB = await getTeamById(match.teamb_id);
 

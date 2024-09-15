@@ -10,6 +10,9 @@ block content
 
     h2 Current Score: 
     p#score  #{match.result}
+
+    h2 Match history: 
+    p#history
     
     p Status: 
     p#status #{match.status}
@@ -37,7 +40,15 @@ block content
         var matchStartDate = new Date("#{match.date}");
         var teamAName = "#{teamA.name}";
         var teamBName = "#{teamB.name}";
-        
+        var match = "#{match.resultdetailed.results}";
+        console.log(match);
+        if (match) {
+            
+            match.split(',').forEach(function(result, index) {
+                $('#history').append(`<p>Set ${index + 1}: ${result}</p>`);
+            });
+        }
+
         function updateElapsedTime() {
             var now = new Date();
             var elapsed = now - matchStartDate;
@@ -56,13 +67,31 @@ block content
             $('#score').text(score);
         }
 
-        socket.on('scoreUpdate', function(data){
-            if(data.match.id == #{match.id}){
+        socket.on('scoreUpdate', function(data) {
+            if (data.match.id == #{match.id}) {
                 teamAName = data.teamA.name;
                 teamBName = data.teamB.name;
-                updateMatchInfo(data.match.result);
+                matchStartDate = new Date(data.match.date);
+                $('#status').text(data.match.status);
+                $('#teamAName').text(teamAName);
+                $('#teamBName').text(teamBName);
+                $('#score').text(data.match.result);
+
+                if (data.match.resultdetailed && Array.isArray(data.match.resultdetailed.results)) {
+
+                    $('#history').empty();
+                    
+                    data.match.resultdetailed.results.forEach(function(result, index) {
+                        $('#history').append(`<p>Set ${index + 1}: ${result}</p>`);
+                    });
+                } else {
+                    console.error("Invalid resultDetailed format:", data.match.resultdetailed);
+                }
+
+                console.log(data);
             }
         });
+
 
         socket.on('finished', function(data){
             if(data.id == #{match.id}){

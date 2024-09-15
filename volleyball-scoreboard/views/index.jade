@@ -17,12 +17,14 @@ block content
         p #{match.teamAName} vs #{match.teamBName}
         p Status: #{match.status}
         p Current result: #{match.result}
-        p Match progres: 
-          each result, index in match.resultdetailed 
-            Set #{result.join(' | ')}
+        p Match progres:
+          if match.resultdetailed 
+            each result, index in match.resultdetailed 
+              Set #{result.join(' | ')}
         if match.status === 'PLANNED' || match.status === 'IN_PROGRESS'
           a(href=`/match/${match.id}`) View
-
+        if match.status !== 'FINISHED'
+          button(onclick=`viewMatch('${match.id}')`) View match
         if match.status === 'FINISHED'
           button(onclick=`copyMatch('${match.id}')`) Copy to clipboard
   
@@ -57,4 +59,8 @@ block content
         navigator.clipboard.writeText(text);
         alert('Copied to clipboard!');
       });
+    }
+
+    function viewMatch(matchId){
+      window.location.href = `/match/${matchId}`;
     }
