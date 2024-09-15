@@ -19,10 +19,10 @@ router.get('/add', async(req, res)=>{
 });
 
 router.get('/:id', async(req, res) =>{
-
+    const { id } = req.params;
     const match = await getMatchById(id);
 
     res.render('match', {match: match});
-})
+});
 
 module.exports = router;
