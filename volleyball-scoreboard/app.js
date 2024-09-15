@@ -18,6 +18,11 @@ var matchRouter = require('./routes/match');
 
 var app = express();
 var server = http.createServer(app);
+const io = socketIO(server);
+
+io.on('connection', (socket) => {
+  console.log('a user connected');
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -61,6 +66,11 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+
+server.listen(3000, () => {
+  console.log('server running at http://localhost:3000');
 });
 
 module.exports = app;
