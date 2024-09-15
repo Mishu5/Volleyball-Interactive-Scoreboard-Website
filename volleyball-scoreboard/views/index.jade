@@ -14,17 +14,17 @@ block content
   ul#matches-list
     each match in matches
       li(date-id=match.id)
-        p #{match.teamA} vs #{match.teamB} - #{new Date(match.date).toISOString().slice(0, 10)}
-        p Status: #{match.status} (#{match.id})
-
+        p #{match.teamAName} vs #{match.teamBName}
+        p Status: #{match.status}
+        p Current result: #{match.result}
+        p Match progres: 
+          each result, index in match.resultdetailed 
+            Set #{result.join(' | ')}
         if match.status === 'PLANNED' || match.status === 'IN_PROGRESS'
-          a(href=`/view/${match.id}`) View
+          a(href=`/match/${match.id}`) View
 
         if match.status === 'FINISHED'
           button(onclick=`copyMatch('${match.id}')`) Copy to clipboard
-
-        form(action="/delete/${match.id}", method="post", style="display:inline;")
-          button(type="submit") Delete match
   
   script(src="/socket.io/socket.io.js")
   script. 

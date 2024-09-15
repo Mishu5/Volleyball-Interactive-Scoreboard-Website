@@ -113,6 +113,7 @@ router.post("/:id/end-match", async(req, res)=>{
         await endMatch(matchId);
         global.io.emit('finished', {id: matchId});
         return res.status(200).json({success: true});
+        
     }catch(error){
         console.error(error);
         return res.status(500).json({message: "Intenal server error"});

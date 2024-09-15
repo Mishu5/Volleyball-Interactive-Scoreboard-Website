@@ -14,13 +14,13 @@ async function addTeam(teamName, players){
 
 async function getAllTeams(){
     const query = 'SELECT * FROM teams';
-    const result = db.any(query);
+    const result = await db.any(query);
     return result;
 }
 
 async function getTeamById(id){
     const query = "SELECT * FROM teams WHERE id = $1";
-    const result = db.oneOrNone(query, [id]);
+    const result = await db.oneOrNone(query, [id]);
     return result;
 };
 
