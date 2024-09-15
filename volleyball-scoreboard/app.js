@@ -18,7 +18,6 @@ var matchRouter = require('./routes/match');
 
 var app = express();
 var server = http.createServer(app);
-const io = socketIO(server);
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -63,15 +62,5 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
 });
-
-//TODO fix
-io.on('connection', (socket) => {
-  console.log('Użytkownik połączony z WebSocket');
-
-  socket.on('disconnect', () => {
-    console.log('Użytkownik rozłączony');
-  });
-});
-module.exports.io = io;
 
 module.exports = app;

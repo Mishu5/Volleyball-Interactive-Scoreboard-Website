@@ -34,7 +34,7 @@ block content
 
     script.
         $(document).ready(function(){
-            //var socket = io();
+            var socket = io();
             var matchStartDate = new Date("#{match.date}");
             var teamAName = "#{teamA.name}";
             var teamBName = "#{teamB.name}";
@@ -57,11 +57,11 @@ block content
                 $('#score').text('"${match.result}"');
             }
 
-            //- socket.on('scoreUpdate', function(data){
-            //-     if(data.matchId == #{match.id}){
-            //-         //do updating here
-            //-     }
-            //- });
+            socket.on('scoreUpdate', function(data){
+                if(data.matchId == #{match.id}){
+                    //do updating here
+                }
+            });
 
             function updateScore(team, increment){
                 var scores = $('#score').text().split(':').map(Number);
