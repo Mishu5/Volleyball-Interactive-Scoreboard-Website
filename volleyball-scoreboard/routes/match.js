@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const io = require('../app').io;
-const { addMatch, getMatchById } = require('../models/match');
+const { addMatch, getMatchById, startMatch, updateScore, endSet, swapTeams, endMatch } = require('../models/match');
 const { getAllTeams } = require('../models/teams');
 
 router.post('/addMatch', async(req, res)=>{
@@ -23,6 +23,84 @@ router.get('/:id', async(req, res) =>{
     const match = await getMatchById(id);
 
     res.render('match', {match: match});
+});
+
+router.post('/:id/update-score', async(req, res)=>{
+
+    const matchId = req.params.id;
+    const { setScore } = req.body;
+    
+    try{
+
+        let match = getMatchById(matchId);
+        if(match.status === "PLANNED"){
+            startMatch(matchId);
+        }
+        updateScore(matchId, setScore);
+
+    }catch(error){
+        console.error(error);
+        return res.status(500).json({message: "Internal server error"});
+    }
+
+});
+
+router.post('/:id/add-score-to-details', async(req, res)=>{
+    const matchId = req.params.id;
+
+    try{
+
+        let match = getMatchById(matchId);
+        const result = match.result;
+        let resultDetailed = match.resultdetailed || {results:[]};
+        resultDetailed.results.push(result);
+        endSet(matchId, resultDetailed);
+
+    }catch(error){
+        console.error(error);
+        return res.status(500).json({message: "Internal server error"});
+    }
+});
+
+router.post('/:id/swap-teams', async(req, res)=>{
+    const matchId = req.params.id;
+
+    try{
+
+        const match = getMatchById(matchId);
+        let result = match.result;
+        let resultDetailed = match.resultdetailed || {results :[]};
+        let teamA = match.teama_id;
+        let teamB = match.teamb_id;
+
+        const parts = result.split(':');
+        result = `${parts[1]}:${parts[0]}`;
+
+        resultDetailed.results = resultDetailed.results.map((set)=>{
+            const [teamAScore, teamBScore] = set.split(':');
+            return `${teamBScore}:${teamAScore}`;
+        });
+
+        swapTeams(matchId, teamB, teamA, result, resultDetailed);
+
+    }catch(error){
+        console.error(error);
+        return res.status(500).json({message: "Internal server error"});
+    }
+
+});
+
+router.post("/:id/end-match", async(req, res)=>{
+    const matchId = req.params.id;
+
+    try{
+
+        endMatch(matchId);
+
+    }catch(error){
+        console.error(error);
+        return res.status(500).json({message: "Intenal server error"});
+    }
 });
 
 module.exports = router;

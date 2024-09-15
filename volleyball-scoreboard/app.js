@@ -64,6 +64,7 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+//TODO fix
 io.on('connection', (socket) => {
   console.log('Użytkownik połączony z WebSocket');
 
