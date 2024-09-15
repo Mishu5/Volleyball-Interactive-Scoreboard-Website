@@ -8,6 +8,7 @@ var http = require('http');
 var bcrypt = require('bcryptjs');
 var db = require('./routes/db');
 var session = require('express-session');
+var { initializeAdminUser } = require('./models/users');
 
 require('dotenv').config();
 
@@ -72,6 +73,8 @@ app.use(function(err, req, res, next) {
 });
 
 module.exports = app;
+
+initializeAdminUser();
 
 server.listen(3000, () => {
   console.log('server running at http://localhost:3000');
