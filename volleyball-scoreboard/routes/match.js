@@ -1,15 +1,14 @@
 var express = require('express');
 var router = express.Router();
-const io = require('../app').io;
 const { addMatch, getMatchById, startMatch, updateScore, endSet, swapTeams, endMatch } = require('../models/match');
 const { getAllTeams, getTeamById } = require('../models/teams');
 
 router.post('/addMatch', async(req, res)=>{
     if(req.session.userRole && req.session.userRole !== "referee"){
-        return res.status(401).json({message: "Unautorize"});
+        return res.status(401).json({message: "Unautorized"});
     }
     const {teamA, teamB} = req.body;
-    addMatch(teamA, teamB);
+    await addMatch(teamA, teamB);
     res.redirect('/');
 });
 
@@ -38,10 +37,14 @@ router.post('/:id/update-score', async(req, res)=>{
 
         let match = await getMatchById(matchId);
         if(match.status === "PLANNED"){
-            startMatch(matchId);
+            await startMatch(matchId);
         }
-        updateScore(matchId, setScore);
-
+        await updateScore(matchId, setScore);
+        match = await getMatchById(matchId);
+        teamA = await getTeamById(match.teama_id);
+        teamB = await getTeamById(match.teamb_id);
+        global.io.emit('scoreUpdate', {match: match, teamA: teamA, teamB: teamB});
+        return res.status(200).json({success: true});
     }catch(error){
         console.error(error);
         return res.status(500).json({message: "Internal server error"});
@@ -54,12 +57,16 @@ router.post('/:id/add-score-to-details', async(req, res)=>{
 
     try{
 
-        let match = getMatchById(matchId);
+        let match = await getMatchById(matchId);
         const result = match.result;
         let resultDetailed = match.resultdetailed || {results:[]};
         resultDetailed.results.push(result);
-        endSet(matchId, resultDetailed);
-
+        await endSet(matchId, resultDetailed);
+        match = await getMatchById(matchId);
+        teamA = await getTeamById(match.teama_id);
+        teamB = await getTeamById(match.teamb_id);
+        global.io.emit('scoreUpdate', {match: match, teamA: teamA, teamB: teamB});
+        return res.status(200).json({success: true});
     }catch(error){
         console.error(error);
         return res.status(500).json({message: "Internal server error"});
@@ -71,7 +78,7 @@ router.post('/:id/swap-teams', async(req, res)=>{
 
     try{
 
-        const match = getMatchById(matchId);
+        let match = await getMatchById(matchId);
         let result = match.result;
         let resultDetailed = match.resultdetailed || {results :[]};
         let teamA = match.teama_id;
@@ -85,8 +92,12 @@ router.post('/:id/swap-teams', async(req, res)=>{
             return `${teamBScore}:${teamAScore}`;
         });
 
-        swapTeams(matchId, teamB, teamA, result, resultDetailed);
-
+        await swapTeams(matchId, teamB, teamA, result, resultDetailed);
+        match = await getMatchById(matchId);
+        teamA = await getTeamById(match.teama_id);
+        teamB = await getTeamById(match.teamb_id);
+        global.io.emit('scoreUpdate', {match: match, teamA: teamA, teamB: teamB});
+        return res.status(200).json({success: true});
     }catch(error){
         console.error(error);
         return res.status(500).json({message: "Internal server error"});
@@ -99,8 +110,9 @@ router.post("/:id/end-match", async(req, res)=>{
 
     try{
 
-        endMatch(matchId);
-
+        await endMatch(matchId);
+        global.io.emit('finished', {id: matchId});
+        return res.status(200).json({success: true});
     }catch(error){
         console.error(error);
         return res.status(500).json({message: "Intenal server error"});

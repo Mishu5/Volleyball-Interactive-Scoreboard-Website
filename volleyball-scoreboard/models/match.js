@@ -30,7 +30,7 @@ const deleteMatch = async (id) => {
 const updateScore = async (matchId, newScore) =>{
     try{
         const query = "UPDATE matches SET result = $1 WHERE id = $2";
-        db.none(query, [newScore, matchId]);
+        await db.none(query, [newScore, matchId]);
     }catch(error){
         console.error(error);
         return {status: 500};
@@ -40,7 +40,7 @@ const updateScore = async (matchId, newScore) =>{
 const startMatch = async(matchId)=>{
     try{
         const query = "UPDATE matches SET date = CURRENT_TIMESTAMP, status = $1 WHERE id = $2";
-        db.none(query, ["IN_PROGRESS", matchId]);
+        await db.none(query, ["IN_PROGRESS", matchId]);
     }catch(error){
         console.error(error);
         return {status: 500};
@@ -50,7 +50,7 @@ const startMatch = async(matchId)=>{
 const endSet = async(matchId, resultDetailed)=>{
     try{
         const query = "UPDATE matches SET resultdetailed = $1, result = $2 WHERE id = $3";
-        db.none(query, [resultDetailed, "0:0", matchId]);
+        await db.none(query, [resultDetailed, "0:0", matchId]);
     }catch(error){
         console.error(error);
         return {status: 500};
@@ -70,7 +70,7 @@ const swapTeams = async(matchId, newTeamA, newTeamB, result, resultDetailed)=>{
 const endMatch = async(matchId)=>{
     try{
         const query = "UPDATE matches set status = $1 WHERE id = $2";
-        db.none(query, ["FINISHED", matchId]);
+        await db.none(query, ["FINISHED", matchId]);
     }catch(error){
         console.error(error);
         return {status: 500};

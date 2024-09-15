@@ -15,6 +15,7 @@ var indexRouter = require('./routes/index');
 var authRouter = require('./routes/auth');
 var teamsRouter = require('./routes/teams');
 var matchRouter = require('./routes/match');
+const router = require('./routes/index');
 
 var app = express();
 var server = http.createServer(app);
@@ -23,6 +24,7 @@ const io = socketIO(server);
 io.on('connection', (socket) => {
   console.log('a user connected');
 });
+global.io = io;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -68,9 +70,8 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+module.exports = app;
 
 server.listen(3000, () => {
   console.log('server running at http://localhost:3000');
 });
-
-module.exports = app;

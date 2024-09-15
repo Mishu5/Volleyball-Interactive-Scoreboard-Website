@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 const Match = require('../models/match');
-const io = require('../app').io;
 
 /* GET home page. */
 router.get('/', async (req, res) => {
